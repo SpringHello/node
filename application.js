@@ -52,10 +52,26 @@ app.use = function (fn) {
         this.lazyrouter()
         var router = this._router
         fns.forEach(fn => {
-            router.use(fn)
+            router.use(path, fn)
         })
     }
 
+}
+
+var methods = getMethods()
+
+methods.forEach(function (method) {
+    app[method] = function (path) {
+        this.lazyrouter()
+        var route = this._router.route(path)
+        route[method].apply(route, Array.prototype.slice.call(arguments, 1))
+    }
+})
+
+function getMethods() {
+    return http.METHODS && http.METHODS.map(function toLowerCase(method) {
+            return method.toLowerCase()
+        })
 }
 
 exports = module.exports = app

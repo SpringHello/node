@@ -3,6 +3,7 @@
  */
 var mixin = require('merge-descriptors')
 var Layer = require("./layer")
+var Route = require("./route")
 
 var proto = module.exports = function () {
 
@@ -18,8 +19,11 @@ var proto = module.exports = function () {
 }
 
 
-proto.route = function () {
-    console.log("router route")
+proto.route = function (path) {
+    var route = new Route(path)
+    var layer = new Layer(path, route.dispatch.bind(this))
+    layer.route = route
+    this.stack.push(layer)
 }
 
 proto.handle = function () {
