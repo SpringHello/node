@@ -1,6 +1,7 @@
 /**
  * Created by yunrui001 on 2017-11-07.
  */
+var methods = require("methods")
 var Router = require("./router")
 var http = require("http")
 
@@ -10,7 +11,7 @@ app.listen = function () {
     var server = http.createServer((req, res) => {
         this.handle(req, res)
     })
-    server.listen(arguments)
+    server.listen.apply(server, arguments)
 }
 
 app.init = function () {
@@ -18,7 +19,8 @@ app.init = function () {
 }
 
 app.handle = function (req, res) {
-    res.end("hello my express")
+    var router = this._router
+    router.handle(req, res)
 }
 
 app.lazyrouter = function () {
@@ -58,7 +60,6 @@ app.use = function (fn) {
 
 }
 
-var methods = getMethods()
 
 methods.forEach(function (method) {
     app[method] = function (path) {
@@ -67,11 +68,5 @@ methods.forEach(function (method) {
         route[method].apply(route, Array.prototype.slice.call(arguments, 1))
     }
 })
-
-function getMethods() {
-    return http.METHODS && http.METHODS.map(function toLowerCase(method) {
-            return method.toLowerCase()
-        })
-}
 
 exports = module.exports = app

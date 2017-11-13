@@ -6,6 +6,10 @@ var express = require("../express")
 
 var app = express()
 
-app.listen(80,function(){
+app.get("/", function (req, res, next) {
+    res.end("hello")
+})
+
+app.listen(80, function () {
     console.log("my express is start")
 })

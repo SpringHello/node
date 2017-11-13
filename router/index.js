@@ -21,9 +21,10 @@ var proto = module.exports = function () {
 
 proto.route = function (path) {
     var route = new Route(path)
-    var layer = new Layer(path, route.dispatch.bind(this))
+    var layer = new Layer(path, route.dispatch.bind(route))
     layer.route = route
     this.stack.push(layer)
+    return route
 }
 
 proto.handle = function () {
