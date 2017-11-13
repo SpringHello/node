@@ -5,108 +5,85 @@
     <title>Title</title>
 </head>
 <body>
-<div id="wrapper">
+<div id="wrapper" style="position: relative;display: inline-block">
+    <label style="position: absolute;right:0px;top:10px">
+        <input type="checkbox">sort
+    </label>
 
 </div>
 <script type="text/javascript" src="./d3.v3.min.js"></script>
 <script type="text/javascript">
+
+    window.addEventListener("change",function(event){
+        var data = dataset.slice()
+        var sortX = xScale.domain(
+            (event.target.checked?data.sort(function(front,back){
+                return back.wage>front.wage
+            }):data).map(function(item){
+                return item.area
+            }))
+
+        var transition = svg.transition().duration(100)
+
+        transition.selectAll(".myRect")
+            .attr("x", function(d) {console.log(d);return sortX(d.area); });
+
+        transition.select(".Xaxis")
+            .call(xAxis)
+    })
+
+
     //1.画布svg
     var width = 600;
     var height = 400;//画布大小
 
     var svg = d3.select("#wrapper").append("svg").attr("width", width).attr("height", height);//添加画布
     //画布周边留白
-    var padding = {left: 30, right: 30, top: 20, bottom: 20};
+    var padding = {left: 70, right: 30, top: 20, bottom: 30};
 
     //定义数据
-    var dataset = [10, 20, 30, 50, 45, 60, 18];
+    var dataset = [{area:'上海',wage:8962},{area:'重庆',wage:5006}, {area:'深证',wage:8315},{area:'北京',wage:9240}, {area:'广州',wage:7409}, {area:'佛山',wage:7107}, {area:'杭州',wage:7330}, {area:'宁波',wage:7152}];
+    var wageList = dataset.map(function(item){
+        return item.wage
+    })
     //x轴比列尺
-    var xScale = d3.scale.ordinal().domain(d3.range(dataset.length)).rangeRoundBands([0, width - padding.left - padding.right]);
+    var xScale = d3.scale.ordinal().domain(dataset.map(function(item){
+        return item.area
+    })).rangeRoundBands([0, width - padding.left - padding.right]);
     //y轴比例尺
-    var yScale = d3.scale.linear().domain([0, d3.max(dataset)]).range([height - padding.top - padding.bottom, 0]);
+    var yScale = d3.scale.linear().domain([0, d3.max(wageList)]).range([height - padding.top - padding.bottom, 0]);
 
     //x坐标轴
     var xAxis = d3.svg.axis().scale(xScale).orient("bottom");
     //y坐标轴
     var yAxis = d3.svg.axis().scale(yScale).orient("left");
+
     //添加矩形元素
-    reRange()
+    var rects = svg.selectAll(".myRect").data(dataset).enter().append("rect").attr("class", "myRect").attr("transform", "translate(" + padding.left + "," + padding.top + ")")
+        .attr("x", function (d, i) {
+            return xScale(d.area) + 2;
+        })
+        .attr("y", function (d, i) {
+            return yScale(d.wage);
+        })
+        .attr("width", function (d, i) {
+            return xScale.rangeBand() - 2;
+        })
+        .attr("height", function (d, i) {
+            return height - padding.top - padding.bottom - yScale(d.wage);
+        })
+        .attr("style", "transition:1s")
+        .attr("fill", "steelblue")
+
 
     //添加坐标轴
     //1.x
-    svg.append("g").attr("class", "axis").attr("transform", "translate(" + padding.left + "," + (height - padding.bottom) + ")")
+    svg.append("g").attr("class", "Xaxis").attr("transform", "translate(" + padding.left + "," + (height - padding.bottom) + ")")
         .call(xAxis);
     //2.y
-    svg.append("g").attr("class", "axis").attr("transform", "translate(" + padding.left + "," + padding.top + ")")
+    svg.append("g").attr("class", "Yaxis").attr("transform", "translate(" + padding.left + "," + padding.top + ")")
         .call(yAxis);
 
-
-    var circle = svg.append("circle")
-        .attr("cx", 100)
-        .attr("cy", 100)
-        .attr("r", 45)
-        .style("fill", "green");
-
-    circle.on("click", function () {
-        var copy = dataset.slice()
-        // 添加交互内容
-        copy.sort(function (a, b) {
-            return a > b
-        })
-        d3.selectAll("rect").data(copy)
-            .attr("height", function (d, i) {
-                return height - padding.top - padding.bottom - yScale(d);
-            })
-            .attr("y", function (d, i) {
-                return yScale(d);
-            })
-
-        d3.selectAll(".myText").data(copy)
-            .append("animate")
-            .attr("attributeName", "y")
-            .attr("from", function (d, i) {
-                console.log("from", yScale(dataset[i]))
-                return yScale(dataset[i])
-            })
-            .attr("to", function (d, i) {
-                console.log("to", yScale(d))
-                return yScale(d)
-            })
-            /*.attr("by", function (d, i) {
-             return yScale(d)
-             })*/
-            .attr("dur", "1s")
-    });
-
-
-    function reRange() {
-        var rects = svg.selectAll(".myRect").data(dataset).enter().append("rect").attr("class", "myRect").attr("transform", "translate(" + padding.left + "," + padding.top + ")")
-            .attr("x", function (d, i) {
-                return xScale(i) + 2;
-            })
-            .attr("y", function (d, i) {
-                return yScale(d);
-            })
-            .attr("width", function (d, i) {
-                return xScale.rangeBand() - 2;
-            })
-            .attr("height", function (d, i) {
-                return height - padding.top - padding.bottom - yScale(d);
-            })
-            .attr("style", "transition:1s")
-            .attr("fill", "steelblue")
-
-        var text = svg.selectAll(".myText").data(dataset).enter().append("text").attr("class", "myText").attr("transform", "translate(" + padding.left + "," + padding.top + ")")
-            .attr("x", function (d, i) {
-                return xScale(i) + 2;
-            })
-            .attr("y", function (d, i) {
-                return yScale(d);
-            })
-            .text(function (d, i) {
-                return d
-            })
-    }
 </script>
 </body>
 </html>

@@ -6,7 +6,7 @@
     <style type="text/css">
         #wrapper {
             transform-style: preserve-3d;
-            perspective: 100px;
+            perspective: 1000px;
             width:100px;
             height:100px;
             transition:2s
@@ -24,7 +24,7 @@
 
         #back {
             display: block;
-            transform: rotateY(180deg);
+            transform: rotateY(180deg) translateZ(0.1px);
             background-color: blue;
             height:100%;
             margin-top:-100%;
