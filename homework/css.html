@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style type="text/css">
+        #wrapper {
+            transform-style: preserve-3d;
+            perspective: 100px;
+            width:100px;
+            height:100px;
+            transition:2s
+        }
+
+        #wrapper:hover {
+            transform: rotateY(180deg);
+        }
+
+        #front {
+            display: block;
+            background-color: red;
+            height:100%
+        }
+
+        #back {
+            display: block;
+            transform: rotateY(180deg);
+            background-color: blue;
+            height:100%;
+            margin-top:-100%;
+        }
+    </style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="front">front</div>
+    <div id="back">back</div>
+</div>
+</body>
+</html>
